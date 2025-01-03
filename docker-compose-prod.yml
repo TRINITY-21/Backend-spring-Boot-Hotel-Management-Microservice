@@ -1,0 +1,151 @@
+version: '3.8'
+
+services:
+
+  # User Service
+  user-service-app:
+    image: trinity505/hotel-user-app:1.0.6
+    container_name: user
+    restart: unless-stopped
+    ports:
+      - "4070:4070"
+    environment:
+      USER_SPRING_DATASOURCE_URL: jdbc:mysql://user-db:3306/hotelUserMGT?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      USER_SPRING_DATASOURCE_USERNAME: user
+      USER_SPRING_DATASOURCE_PASSWORD: userpassword
+      USER_SPRING_MAIL_USERNAME: anc@gmail.com
+      USER_SPRING_MAIL_PASSWORD: qoyr ooocnne exng
+      USER_AWS_ACCESS_KEY: AKIA4VIMPTE4H5HCT
+      USER_AWS_SECRET_KEY: pybgTI6so1tEPkb606aUOQfd3XefCHqeJ
+      USER_SERVICE_URL: http://localhost:4070/api/users
+      ROOM_SERVICE_URL: http://localhost:4060/api/rooms
+    networks:
+      - app-network
+    depends_on:
+      user-db:
+        condition: service_healthy
+
+  # Room Service
+  room-service-app:
+    image: trinity505/hotel-room-app:1.0.6
+    container_name: room
+    restart: unless-stopped
+    ports:
+      - "4060:4060"
+    environment:
+      ROOM_SPRING_DATASOURCE_URL: jdbc:mysql://room-db:3306/hotelRoomMGT?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      ROOM_SPRING_DATASOURCE_USERNAME: room
+      ROOM_SPRING_DATASOURCE_PASSWORD: roompassword
+      ROOM_SPRING_MAIL_USERNAME: mm@gmail.com
+      ROOM_SPRING_MAIL_PASSWORD: 87 ry exng dnfl
+      ROOM_AWS_ACCESS_KEY: AKVDBMyyIMPTEvg4H5HCT
+      ROOM_AWS_SECRET_KEY: ggg+o1tEPkb6aUOQfd3XefCHqeJ
+      ROOM_SERVICE_URL: http://localhost:4060/api/rooms
+      BOOKING_SERVICE_URL: http://localhost:4050/api/bookings
+    networks:
+      - app-network
+    depends_on:
+      room-db:
+        condition: service_healthy
+
+  # Booking Service
+  booking-service-app:
+    image: trinity505/hotel-booking-app:1.0.6
+    container_name: booking
+    restart: unless-stopped
+    ports:
+      - "4050:4050"
+    environment:
+      BOOKING_SPRING_DATASOURCE_URL: jdbc:mysql://booking-db:3306/hotelBookingMGT?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      BOOKING_SPRING_DATASOURCE_USERNAME: booking
+      BOOKING_SPRING_DATASOURCE_PASSWORD: bookingpassword
+      BOOKING_SPRING_MAIL_USERNAME: io@gmail.com
+      BOOKING_SPRING_MAIL_PASSWORD: 77 th exng dnfl
+      BOOKING_AWS_ACCESS_KEY: uyututu
+      BOOKING_AWS_SECRET_KEY: tuuu+utut
+      ROOM_SERVICE_URL: http://localhost:4060/api/rooms
+      USER_SERVICE_URL: http://localhost:4070/api/users
+    networks:
+      - app-network
+    depends_on:
+      booking-db:
+        condition: service_healthy
+
+
+  # User Database
+  user-db:
+    image: mysql:9.1
+    container_name: user-db
+
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: hotelUserMGT
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+    ports:
+      - "3301:3306"
+    volumes:
+      - user-db-data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+  # Room Database
+  room-db:
+    image: mysql:9.1
+    container_name: room-db
+
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: hotelRoomMGT
+      MYSQL_USER: room
+      MYSQL_PASSWORD: roompassword
+    ports:
+      - "3302:3306"
+    volumes:
+      - room-db-data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+  # Booking Database
+  booking-db:
+    image: mysql:9.1
+    container_name: booking-db
+
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: hotelBookingMGT
+      MYSQL_USER: booking
+      MYSQL_PASSWORD: bookingpassword
+    ports:
+      - "3303:3306"
+    volumes:
+      - booking-db-data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+volumes:
+  user-db-data:
+  room-db-data:
+  booking-db-data:
+
+networks:
+  app-network:
+    driver: bridge

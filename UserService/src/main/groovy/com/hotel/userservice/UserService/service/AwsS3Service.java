@@ -8,6 +8,8 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.hotel.userservice.UserService.exception.BaseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,48 +19,44 @@ import java.io.InputStream;
 @Service
 public class AwsS3Service {
 
-    //    private final String bucketName = "phegon-hotel-images";
+    private static final Logger logger = LoggerFactory.getLogger(AwsS3Service.class);
+
+    private final AmazonS3 s3Client;
     private final String bucketName = "trinity-hotel-images";
 
-    @Value("${aws.s3.access.key}")
-    private String awsS3AccessKey;
+    public AwsS3Service(
+            @Value("${aws.s3.access.key}") String accessKey,
+            @Value("${aws.s3.secret.key}") String secretKey) {
 
-    @Value("${aws.s3.secret.key}")
-    private String awsS3SecretKey;
+        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+        this.s3Client = AmazonS3ClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .withRegion(Regions.EU_NORTH_1)
+                .build();
+    }
 
     public String saveImageToS3(MultipartFile photo) {
-        String s3LocationImage = null;
+        if (photo == null || photo.isEmpty()) {
+            throw new BaseException("File is empty or null");
+        }
 
-        try {
+        String s3Filename = photo.getOriginalFilename();
 
-            String s3Filename = photo.getOriginalFilename();
-
-            BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecretKey);
-            AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                    .withRegion(Regions.EU_NORTH_1)
-                    .build();
-
-            InputStream inputStream = photo.getInputStream();
-
+        try (InputStream inputStream = photo.getInputStream()) {
+            // Set metadata
             ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType("image/jpeg");
+            metadata.setContentType(photo.getContentType());
+            metadata.setContentLength(photo.getSize());
 
+            // Upload file
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3Filename, inputStream, metadata);
             s3Client.putObject(putObjectRequest);
 
+            // Return S3 file URL
             return "https://" + bucketName + ".s3.amazonaws.com/" + s3Filename;
-
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new BaseException("Unable to upload image to s3 bucket" + e.getMessage());
+            logger.error("Error uploading image to S3: {}", e.getMessage(), e);
+            throw new BaseException("Unable to upload image to S3 bucket: " + e.getMessage());
         }
     }
 }
-
-
-
-
-
-
-

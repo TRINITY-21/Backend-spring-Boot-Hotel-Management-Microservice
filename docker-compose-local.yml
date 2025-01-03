@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+  # User Service
+  user-service-app:
+    image: trinity505/hotel-user-app:1.0.6
+    container_name: user
+    ports:
+      - "4070:4070"
+    environment:
+      USER_SPRING_DATASOURCE_URL: jdbc:mysql://user-db:3306/hotelUserMGT?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      USER_SPRING_DATASOURCE_USERNAME: user
+      USER_SPRING_DATASOURCE_PASSWORD: userpassword
+      USER_SPRING_MAIL_USERNAME: 00@gmail.com
+      USER_SPRING_MAIL_PASSWORD: qoyr 77g exng yu
+      USER_AWS_ACCESS_KEY: uuiui09
+      USER_AWS_SECRET_KEY: uuiu+yuy
+      USER_SERVICE_URL: http://user-service-app:4070/api/users
+      ROOM_SERVICE_URL: http://room-service-app:4060/api/rooms
+    networks:
+      - app-network
+    depends_on:
+      - user-db
+
+  # Room Service
+  room-service-app:
+    image: trinity505/hotel-room-app:1.0.6
+    container_name: room
+    ports:
+      - "4060:4060"
+    environment:
+      ROOM_SPRING_DATASOURCE_URL: jdbc:mysql://room-db:3306/hotelRoomMGT?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      ROOM_SPRING_DATASOURCE_USERNAME: room
+      ROOM_SPRING_DATASOURCE_PASSWORD: roompassword
+      ROOM_SPRING_MAIL_USERNAME: io@gmail.com
+      ROOM_SPRING_MAIL_PASSWORD: g 7uy gyyju 66
+      ROOM_AWS_ACCESS_KEY: uyuiuyy
+      ROOM_AWS_SECRET_KEY: yiyiy+iykjj
+      ROOM_SERVICE_URL: http://room-service-app:4060/api/rooms
+      BOOKING_SERVICE_URL: http://booking-service-app:4050/api/bookings
+    networks:
+      - app-network
+    depends_on:
+      - room-db
+
+  # Booking Service
+  booking-service-app:
+    image: trinity505/hotel-booking-app:1.0.6
+    container_name: booking
+    ports:
+      - "4050:4050"
+    environment:
+      BOOKING_SPRING_DATASOURCE_URL: jdbc:mysql://booking-db:3306/hotelBookingMGT?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      BOOKING_SPRING_DATASOURCE_USERNAME: booking
+      BOOKING_SPRING_DATASOURCE_PASSWORD: bookingpassword
+      BOOKING_SPRING_MAIL_USERNAME: jj@gmail.com
+      BOOKING_SPRING_MAIL_PASSWORD: jj jj jj jj
+      BOOKING_AWS_ACCESS_KEY: jjjjjvuj
+      BOOKING_AWS_SECRET_KEY: uiuiui+8888
+      ROOM_SERVICE_URL: http://room-service-app:4060/api/rooms
+      USER_SERVICE_URL: http://user-service-app:4070/api/users
+    networks:
+      - app-network
+    depends_on:
+      - booking-db
+
+  # User Database
+  user-db:
+    image: mysql:9.1
+    container_name: user-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: hotelUserMGT
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+    ports:
+      - "3301:3306"
+    volumes:
+      - user-db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  # Room Database
+  room-db:
+    image: mysql:9.1
+    container_name: room-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: hotelRoomMGT
+      MYSQL_USER: room
+      MYSQL_PASSWORD: roompassword
+    ports:
+      - "3302:3306"
+    volumes:
+      - room-db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  # Booking Database
+  booking-db:
+    image: mysql:9.1
+    container_name: booking-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: hotelBookingMGT
+      MYSQL_USER: booking
+      MYSQL_PASSWORD: bookingpassword
+    ports:
+      - "3303:3306"
+    volumes:
+      - booking-db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+volumes:
+  user-db-data:
+  room-db-data:
+  booking-db-data:
+
+networks:
+  app-network:
+    driver: bridge
