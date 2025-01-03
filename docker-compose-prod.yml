@@ -14,9 +14,9 @@ services:
       USER_SPRING_DATASOURCE_USERNAME: user
       USER_SPRING_DATASOURCE_PASSWORD: userpassword
       USER_SPRING_MAIL_USERNAME: anc@gmail.com
-      USER_SPRING_MAIL_PASSWORD: qoyr ooocnne exng
-      USER_AWS_ACCESS_KEY: AKIA4VIMPTE4H5HCT
-      USER_AWS_SECRET_KEY: pybgTI6so1tEPkb606aUOQfd3XefCHqeJ
+      USER_SPRING_MAIL_PASSWORD: fdf ddf 334
+      USER_AWS_ACCESS_KEY: dfdf
+      USER_AWS_SECRET_KEY: dfdfdf
       USER_SERVICE_URL: http://localhost:4070/api/users
       ROOM_SERVICE_URL: http://localhost:4060/api/rooms
     networks:
@@ -38,8 +38,8 @@ services:
       ROOM_SPRING_DATASOURCE_PASSWORD: roompassword
       ROOM_SPRING_MAIL_USERNAME: mm@gmail.com
       ROOM_SPRING_MAIL_PASSWORD: 87 ry exng dnfl
-      ROOM_AWS_ACCESS_KEY: AKVDBMyyIMPTEvg4H5HCT
-      ROOM_AWS_SECRET_KEY: ggg+o1tEPkb6aUOQfd3XefCHqeJ
+      ROOM_AWS_ACCESS_KEY: fdfdfd
+      ROOM_AWS_SECRET_KEY: ggg+fdfd
       ROOM_SERVICE_URL: http://localhost:4060/api/rooms
       BOOKING_SERVICE_URL: http://localhost:4050/api/bookings
     networks:
